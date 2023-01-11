@@ -7,8 +7,11 @@ import com.mas.user.dto.UserAppCreateDTO;
 import com.mas.user.dto.UserAppDTO;
 import com.mas.user.dto.UserAppLoginDTO;
 import com.mas.util.Util;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +26,11 @@ public class UserAppServiceImpl implements UserAppService{
     private final UserAppRepository userAppRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper = new ModelMapper(); // convert objects to dto and vice versa
+
+    @Value("${application.security.access-token-secret}")
+    private  String accessTokenSecret;
+    @Value("${application.security.refresh-token-secret}")
+    private  String refreshTokenSecret;
 
 
     @Override
@@ -42,15 +50,21 @@ public class UserAppServiceImpl implements UserAppService{
     }
 
     @Override
-    public ResponseEntity<Object> login(UserAppLoginDTO userAppLoginDTO) {
+    public ResponseEntity<Object> login(UserAppLoginDTO userAppLoginDTO, HttpServletResponse response) {
         // find user by email and check password
         var optionalUserApp = userAppRepository.findByEmail(userAppLoginDTO.getEmail());
         if (optionalUserApp.isEmpty() || !passwordEncoder.matches(userAppLoginDTO.getPassword(), optionalUserApp.get().getPassword())){ // if user not found or password not match
             return Util.generateErrorResponseAPI("invalid credentials",HttpStatusCode.valueOf(400));
         }
 
-        // return token
-        Token token = Token.of(optionalUserApp.get().getId(), 10L);
-        return Util.generateSuccessResponseAPI(token, HttpStatusCode.valueOf(200));
+        // return tokens
+        Login login = Login.of(optionalUserApp.get().getId(),accessTokenSecret,refreshTokenSecret);
+
+        Cookie cookie = new Cookie("refresh_token", login.getRefreshToken().getToken());
+        cookie.setMaxAge(3600);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api");
+        response.addCookie(cookie);
+        return Util.generateSuccessResponseAPI(login.getAccessToken(), HttpStatusCode.valueOf(200));
     }
 }

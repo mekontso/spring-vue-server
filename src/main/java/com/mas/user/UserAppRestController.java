@@ -3,6 +3,7 @@ package com.mas.user;
 import com.mas.user.dto.UserAppCreateDTO;
 import com.mas.user.dto.UserAppLoginDTO;
 import com.mas.user.service.UserAppServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class UserAppRestController {
         return userAppService.register(userAppCreateDTO);
     }
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody UserAppLoginDTO userAppLoginDTO){
-        return userAppService.login(userAppLoginDTO);
+    public ResponseEntity<Object> login(@RequestBody UserAppLoginDTO userAppLoginDTO, HttpServletResponse response){
+        return userAppService.login(userAppLoginDTO, response);
     }
 }
