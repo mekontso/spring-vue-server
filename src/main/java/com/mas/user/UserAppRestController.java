@@ -1,6 +1,7 @@
 package com.mas.user;
 
 import com.mas.user.dto.UserAppCreateDTO;
+import com.mas.user.dto.UserAppLoginDTO;
 import com.mas.user.service.UserAppServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +20,9 @@ public class UserAppRestController {
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody UserAppCreateDTO userAppCreateDTO){
         return userAppService.register(userAppCreateDTO);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody UserAppLoginDTO userAppLoginDTO){
+        return userAppService.login(userAppLoginDTO);
     }
 }

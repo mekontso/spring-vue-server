@@ -1,6 +1,7 @@
 package com.mas.user.service;
 
 import com.mas.user.dto.UserAppCreateDTO;
+import com.mas.user.dto.UserAppLoginDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface UserAppService {
@@ -10,4 +11,7 @@ public interface UserAppService {
      * @return response to be sent to user
      */
     ResponseEntity<Object> register(UserAppCreateDTO userAppCreateDTO);
+    ResponseEntity<Object> login(UserAppLoginDTO userAppLoginDTO);
+
+
 }
