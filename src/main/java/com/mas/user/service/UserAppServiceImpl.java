@@ -1,5 +1,6 @@
 package com.mas.user.service;
 
+import com.mas.jwt.Token;
 import com.mas.user.UserApp;
 import com.mas.user.UserAppRepository;
 import com.mas.user.dto.UserAppCreateDTO;
@@ -47,7 +48,9 @@ public class UserAppServiceImpl implements UserAppService{
         if (optionalUserApp.isEmpty() || !passwordEncoder.matches(userAppLoginDTO.getPassword(), optionalUserApp.get().getPassword())){ // if user not found or password not match
             return Util.generateErrorResponseAPI("invalid credentials",HttpStatusCode.valueOf(400));
         }
-        // return user
-        return Util.generateSuccessResponseAPI(modelMapper.map(optionalUserApp.get(), UserAppDTO.class), HttpStatusCode.valueOf(200));
+
+        // return token
+        Token token = Token.of(optionalUserApp.get().getId(), 10L);
+        return Util.generateSuccessResponseAPI(token, HttpStatusCode.valueOf(200));
     }
 }
